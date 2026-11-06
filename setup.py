@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import getpass
 import json
 from pathlib import Path
 
@@ -22,7 +23,12 @@ def main() -> None:
     print("1. Mở Telegram, tìm @BotFather")
     print("2. Gõ /newbot (hoặc lấy token của bot đã có)")
     while True:
-        token = input("🔑 Nhập Telegram Bot Token: ").strip()
+        try:
+            token = getpass.getpass("🔑 Nhập Telegram Bot Token (ký tự sẽ được ẩn để bảo mật): ").strip()
+        except Exception:
+            token = input("🔑 Nhập Telegram Bot Token: ").strip()
+        if not token:
+            token = input("🔑 Nhập Telegram Bot Token: ").strip()
         if len(token) > 15 and ":" in token:
             break
         print("⚠️ Token không hợp lệ (cần có dạng 123456:ABC-DEF...). Vui lòng thử lại.")
