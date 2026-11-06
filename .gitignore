@@ -1,0 +1,13 @@
+# Cấu hình nhạy cảm (chứa Bot Token & User ID)
+config.json
+
+# Dữ liệu phiên làm việc cục bộ
+data/
+
+# Python cache & môi trường ảo
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+.env
