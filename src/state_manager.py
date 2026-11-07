@@ -36,9 +36,9 @@ class StateManager:
     Đồng thời hỗ trợ đọc danh sách hội thoại gần đây từ thư mục brain của Antigravity CLI.
     """
 
-    def __init__(self, app_config: AppConfig) -> None:
+    def __init__(self, app_config: AppConfig, sessions_file: Path | None = None) -> None:
         self.app_config = app_config
-        self.sessions_file = DATA_DIR / "sessions.json"
+        self.sessions_file = sessions_file or (DATA_DIR / "sessions.json")
         self.brain_dir = Path.home() / ".gemini" / "antigravity-cli" / "brain"
         self._sessions: dict[int, ChatSession] = {}
         self._load()
