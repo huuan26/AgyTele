@@ -16,22 +16,9 @@
       <stop offset="100%" stop-color="#c084fc" />
     </linearGradient>
 
-    <linearGradient id="crossGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#38bdf8" />
-      <stop offset="100%" stop-color="#a855f7" />
-    </linearGradient>
-
     <pattern id="pixelGrid" width="16" height="16" patternUnits="userSpaceOnUse">
       <rect width="1" height="1" fill="#334155" opacity="0.3" />
     </pattern>
-
-    <filter id="neonGlow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="3" result="blur" />
-      <feMerge>
-        <feMergeNode in="blur" />
-        <feMergeNode in="SourceGraphic" />
-      </feMerge>
-    </filter>
   </defs>
 
   <!-- Background -->
@@ -40,7 +27,7 @@
   <rect x="1" y="1" width="918" height="218" rx="9" fill="none" stroke="#1e293b" stroke-width="1.5" />
 
   <!-- Pixel Icon Container (Left) -->
-  <g transform="translate(42, 34)" shape-rendering="crispEdges">
+  <g transform="translate(48, 34)" shape-rendering="crispEdges">
     <!-- Antigravity Gravitational Ring (Pixelated Orbit) -->
     <rect x="24" y="18" width="6" height="6" fill="#6366f1" opacity="0.6" />
     <rect x="18" y="24" width="6" height="6" fill="#6366f1" opacity="0.8" />
@@ -101,7 +88,7 @@
   </g>
 
   <!-- Typography & Pixel Header (Right) -->
-  <g transform="translate(205, 34)">
+  <g transform="translate(215, 34)">
     <!-- Pixel Text "AGY" -->
     <g fill="url(#cyanGrad)" shape-rendering="crispEdges">
       <!-- Letter A -->
@@ -124,21 +111,8 @@
       <rect x="110" y="40" width="8" height="24" />
     </g>
 
-    <!-- Pixel "X" Separator -->
-    <g transform="translate(156, 12)" fill="url(#crossGrad)" shape-rendering="crispEdges">
-      <rect x="0" y="4" width="8" height="8" />
-      <rect x="24" y="4" width="8" height="8" />
-      <rect x="6" y="12" width="8" height="8" />
-      <rect x="18" y="12" width="8" height="8" />
-      <rect x="12" y="20" width="8" height="12" />
-      <rect x="6" y="32" width="8" height="8" />
-      <rect x="18" y="32" width="8" height="8" />
-      <rect x="0" y="40" width="8" height="8" />
-      <rect x="24" y="40" width="8" height="8" />
-    </g>
-
     <!-- Pixel Text "TELE" -->
-    <g transform="translate(208, 0)" fill="url(#purpleGrad)" shape-rendering="crispEdges">
+    <g transform="translate(156, 0)" fill="url(#purpleGrad)" shape-rendering="crispEdges">
       <!-- Letter T -->
       <rect x="0" y="8" width="36" height="8" />
       <rect x="14" y="16" width="8" height="48" />

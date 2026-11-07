@@ -3,6 +3,8 @@ from __future__ import annotations
 import unittest
 from pathlib import Path
 
+import tempfile
+
 from src.agy_bridge import format_tool_status
 from src.config import AppConfig
 from src.formatter import markdown_to_telegram_html, split_html_message
@@ -54,12 +56,14 @@ class TestStateManager(unittest.TestCase):
             default_workspace=str(Path.home()),
             default_model="gemini-4-argon-high",
         )
-        sm = StateManager(cfg)
-        session = sm.get_session(999)
-        self.assertEqual(session.model, "gemini-4-argon-high")
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp_sessions = Path(tmpdir) / "test_sessions.json"
+            sm = StateManager(cfg, sessions_file=tmp_sessions)
+            session = sm.get_session(999)
+            self.assertEqual(session.model, "gemini-4-argon-high")
 
-        sm.set_model(999, "gemini-3.8-flash-high")
-        self.assertEqual(sm.get_session(999).model, "gemini-3.8-flash-high")
+            sm.set_model(999, "gemini-3.8-flash-high")
+            self.assertEqual(sm.get_session(999).model, "gemini-3.8-flash-high")
 
 
 if __name__ == "__main__":

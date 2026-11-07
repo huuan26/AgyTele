@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assets/agy_tele_pixel.svg" alt="Agy X Tele Pixel Banner" width="100%" />
+<img src="assets/agy_tele_pixel.svg" alt="Agy Tele Pixel Banner" width="100%" />
 
 <pre align="center">
                ▄▄
@@ -14,12 +14,12 @@
        ██   ███
       ▀▀   ▀▀
 
- █████╗   ██████╗ ██╗   ██╗    ██╗  ██╗    ████████╗███████╗██╗     ███████╗
-██╔══██╗ ██╔════╝ ╚██╗ ██╔╝    ╚██╗██╔╝    ╚══██╔══╝██╔════╝██║     ██╔════╝
-███████║ ██║  ███╗ ╚████╔╝      ╚███╔╝        ██║   █████╗  ██║     █████╗  
-██╔══██║ ██║   ██║  ╚██╔╝       ██╔██╗        ██║   ██╔══╝  ██║     ██╔══╝  
-██║  ██║ ╚██████╔╝   ██║       ██╔╝ ██╗       ██║   ███████╗███████╗███████╗
-╚═╝  ╚═╝  ╚═════╝    ╚═╝       ╚═╝  ╚═╝       ╚═╝   ╚══════╝╚══════╝╚══════╝
+ █████╗   ██████╗ ██╗   ██╗    ████████╗███████╗██╗     ███████╗
+██╔══██╗ ██╔════╝ ╚██╗ ██╔╝    ╚══██╔══╝██╔════╝██║     ██╔════╝
+███████║ ██║  ███╗ ╚████╔╝        ██║   █████╗  ██║     █████╗  
+██╔══██║ ██║   ██║  ╚██╔╝         ██║   ██╔══╝  ██║     ██╔══╝  
+██║  ██║ ╚██████╔╝   ██║          ██║   ███████╗███████╗███████╗
+╚═╝  ╚═╝  ╚═════╝    ╚═╝          ╚═╝   ╚══════╝╚══════╝╚══════╝
 </pre>
 
 <p align="center">
@@ -38,7 +38,7 @@
 <p align="center">
   <a href="#overview">Overview</a> &bull;
   <a href="#key-features">Key Features</a> &bull;
-  <a href="#architectural-comparison">Why AgyTele</a> &bull;
+  <a href="#technical-specifications">Specifications</a> &bull;
   <a href="#system-architecture">System Architecture</a> &bull;
   <a href="#live-telemetry-interface">Live Telemetry</a> &bull;
   <a href="#quick-start">Quick Start</a> &bull;
@@ -55,7 +55,7 @@
 
 AgyTele is a lightweight, zero-dependency async Telegram bridge designed specifically for the Google Antigravity CLI (`agy`). Written entirely in standard Python 3.10+ using `asyncio`, it bridges your local AI coding assistant directly to your mobile and desktop Telegram clients.
 
-Unlike fragile terminal-scraping scripts, AgyTele spawns `agy` with native `--output-format stream-json` over an asynchronous stdout pipe. It parses structured NDJSON telemetry events in real time, reports active tool calls directly to your smartphone, renders interactive inline keyboards for model and workspace switching, and enforces strict single-instance mutual exclusion without requiring a single third-party package.
+AgyTele interacts with `agy` using native `--output-format stream-json` over an asynchronous stdout pipe. It parses structured NDJSON telemetry events in real time, reports active tool calls directly to your smartphone, renders interactive inline keyboards for model and workspace switching, and enforces strict single-instance mutual exclusion without requiring third-party runtime dependencies.
 
 ---
 
@@ -84,7 +84,7 @@ Unlike fragile terminal-scraping scripts, AgyTele spawns `agy` with native `--ou
         Runs instantly on any standard Python environment.
       </td>
       <td>
-        Engineered exclusively using Python standard library modules: <code>asyncio</code>, <code>urllib.request</code>, <code>json</code>, <code>socket</code>, <code>pathlib</code>, and <code>re</code>. No <code>pip install</code> step, no native C++ node-gyp bindings, and no virtual environment overhead.
+        Engineered exclusively using Python standard library modules: <code>asyncio</code>, <code>urllib.request</code>, <code>json</code>, <code>socket</code>, <code>pathlib</code>, and <code>re</code>. No <code>pip install</code> step, no native compilation requirements, and no virtual environment overhead.
       </td>
     </tr>
     <tr>
@@ -128,19 +128,19 @@ Unlike fragile terminal-scraping scripts, AgyTele spawns `agy` with native `--ou
 
 ---
 
-## Architectural Comparison
+## Technical Specifications
 
-AgyTele replaces the design patterns found in legacy JavaScript wrappers (`agy-cli-telegram`) with native structured event processing:
+AgyTele is engineered for deterministic, lightweight execution without background bloat or runtime overhead:
 
-| Dimension | Legacy JS Wrapper (`agy-cli-telegram`) | AgyTele (Python Native) |
+| System Component | Implementation Pattern | Technical Advantage |
 | :--- | :--- | :--- |
-| **CLI Protocol** | Plain-text `--print` output; strips terminal ANSI color codes and relies on timeouts for completion detection | Native `--output-format stream-json`; streams structured NDJSON frames directly from stdout |
-| **Tool Telemetry** | Polls the trailing 512KB of local `transcript.jsonl` files every 1000ms via file-system intervals | Intercepts `step_update` (`state="ACTIVE"`) events directly from the process execution pipe in real time |
-| **Model Discovery** | Emulates a pseudo-terminal using native C++ addons (`node-pty`) to capture interactive terminal menus | Executes `agy models` via clean async subprocess calls and dynamically constructs Telegram Inline Keyboards |
-| **External Packages** | Requires `node-pty`, `inquirer`, `node-telegram-bot-api`, and runtime Node dependencies | Zero dependencies; 100% Python standard library (`asyncio`, `urllib.request`) |
-| **Process Interruption** | Not supported; active CLI executions cannot be aborted from Telegram | Supported; triggers immediate subprocess termination (`SIGTERM`/`SIGKILL`) via `/stop` or the inline stop button |
-| **Workspace Routing** | Static; execution path remains locked to the directory where the bot was initialized | Dynamic; inspects local project roots and supports live directory switching via `/workspace` and `/cd` |
-| **Operational Model** | Configured for continuous 24/7 background service execution (PM2 / systemd) | On-demand terminal lifecycle; flushes queued offline updates on launch and sends startup/shutdown status alerts |
+| **CLI Protocol** | Native `--output-format stream-json` over an async 16MB stdout pipe | Structured NDJSON event streaming without terminal scraping, ANSI stripping, or heuristic completion timeouts |
+| **Tool Telemetry** | Direct interception of `step_update` (`state="ACTIVE"`) stream events | Sub-millisecond telemetry delivery directly from stdout rather than polling disk-backed transcript files |
+| **Model Discovery** | Asynchronous execution of `agy models` via `asyncio.create_subprocess_exec` | Dynamic parsing of CLI models rendered directly into responsive Telegram inline keyboards |
+| **Runtime Footprint** | Exclusively Python standard library (`asyncio`, `urllib.request`, `socket`, `pathlib`) | Zero external dependencies; no package installations, no binary compilation, and instant cold startup |
+| **Process Interruption** | Signal-based subprocess management (`SIGINT`/`SIGTERM`/`SIGKILL`) | Instant task cancellation from Telegram clients via `/stop` or the inline stop button |
+| **Workspace Routing** | Dynamic directory resolution and Git repository detection | On-the-fly project switching via `/workspace` and `/cd` without restarting the process |
+| **Execution Lifecycle** | On-demand terminal-bound lifecycle with startup update flush | Flushes stale offline messages before processing commands and shuts down cleanly on terminal exit |
 
 ---
 
