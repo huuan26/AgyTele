@@ -1,7 +1,5 @@
 <div align="center">
 
-<img src="assets/agy_tele_pixel.svg" alt="Agy Tele Pixel Banner" width="100%" />
-
 <pre align="center">
                ▄▄
               ████▄▄
