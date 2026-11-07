@@ -78,10 +78,11 @@ async def run_bot() -> None:
     # 3. Thông báo cho chủ sở hữu biết Bot đã sẵn sàng
     now_str = datetime.now().strftime("%H:%M:%S - %d/%m/%Y")
     admin_id = next(iter(app_config.allowed_user_ids))
+    effective_model = state.get_effective_model(admin_id)
     await tg.send_message(
         admin_id,
         f"🟢 <b>Anti-Tele-An đã khởi động!</b> (<code>{now_str}</code>)\n"
-        f"• <b>Model:</b> <code>{escape_html(app_config.default_model)}</code>\n"
+        f"• <b>Model:</b> <code>{escape_html(effective_model)}</code> <i>(Đồng bộ theo máy)</i>\n"
         f"• <b>Workspace:</b> <code>{escape_html(app_config.default_workspace)}</code>\n"
         f"<i>Các tin nhắn gửi lúc tắt máy đã được dọn sạch. Gõ /help để xem bảng điều khiển.</i>",
     )

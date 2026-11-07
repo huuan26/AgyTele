@@ -203,11 +203,18 @@ class AgyBridge:
             ]
         }
 
+        effective_model = self.state.get_effective_model(chat_id)
+        model_display = (
+            f"{effective_model} (Đồng bộ theo máy)"
+            if session.model in ("auto", "local")
+            else session.model
+        )
+
         # 1. Gửi tin nhắn trạng thái ban đầu kèm nút Stop
         status_res = await self.tg.send_message(
             chat_id,
             f"🧠 <b>Antigravity đang xử lý...</b>\n"
-            f"• <b>Model:</b> <code>{escape_html(session.model)}</code>\n"
+            f"• <b>Model:</b> <code>{escape_html(model_display)}</code>\n"
             f"• <b>Workspace:</b> <code>{escape_html(session.workspace)}</code>",
             reply_markup=stop_markup,
         )
@@ -225,8 +232,10 @@ class AgyBridge:
         if session.conversation_id:
             args.extend(["--conversation", session.conversation_id])
 
-        if session.model:
+        if session.model and session.model.lower() not in ("auto", "local"):
             args.extend(["--model", session.model])
+        elif effective_model and effective_model.lower() != "auto":
+            args.extend(["--model", effective_model])
 
         if session.permission_mode == "auto":
             args.append("--dangerously-skip-permissions")

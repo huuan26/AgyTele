@@ -8,6 +8,23 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_CONFIG_PATH = PROJECT_ROOT / "config.json"
 DATA_DIR = PROJECT_ROOT / "data"
+SETTINGS_PATH = Path.home() / ".gemini" / "antigravity-cli" / "settings.json"
+
+
+def get_active_local_model() -> str:
+    """
+    Đọc model mà máy tính đang dùng hiện tại với Antigravity CLI local
+    từ file ~/.gemini/antigravity-cli/settings.json.
+    """
+    if SETTINGS_PATH.exists():
+        try:
+            data = json.loads(SETTINGS_PATH.read_text(encoding="utf-8"))
+            model = data.get("model")
+            if model and str(model).strip():
+                return str(model).strip()
+        except Exception:
+            pass
+    return "auto"
 
 
 @dataclass
@@ -56,7 +73,12 @@ def load_config(config_path: Path | None = None) -> AppConfig:
     if not Path(default_ws).is_dir():
         default_ws = str(Path.home())
 
-    default_model = str(raw.get("default_model") or "gemini-4-argon-high").strip()
+    raw_model = str(raw.get("default_model") or "").strip()
+    if not raw_model or raw_model.lower() in ("auto", "local", "current"):
+        default_model = get_active_local_model()
+    else:
+        default_model = raw_model
+
     permission_mode = str(raw.get("permission_mode") or "auto").strip()
 
     DATA_DIR.mkdir(parents=True, exist_ok=True)

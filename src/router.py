@@ -127,12 +127,21 @@ class BotRouter:
         if data.startswith("set_model:"):
             model_id = data.split(":", 1)[1]
             self.state.set_model(chat_id, model_id)
-            await self.tg.answer_callback_query(cb_id, f"Đã chọn: {model_id}")
-            await self.tg.edit_message_text(
-                chat_id,
-                msg_id,
-                f"🤖 <b>Đã chuyển sang Model:</b> <code>{escape_html(model_id)}</code>",
-            )
+            effective = self.state.get_effective_model(chat_id)
+            if model_id in ("auto", "local"):
+                await self.tg.answer_callback_query(cb_id, f"Đã chọn: Tự động theo máy ({effective})")
+                await self.tg.edit_message_text(
+                    chat_id,
+                    msg_id,
+                    f"🤖 <b>Đã chuyển sang:</b> <code>Tự động đồng bộ theo máy tính ({escape_html(effective)})</code>",
+                )
+            else:
+                await self.tg.answer_callback_query(cb_id, f"Đã chọn: {model_id}")
+                await self.tg.edit_message_text(
+                    chat_id,
+                    msg_id,
+                    f"🤖 <b>Đã chuyển sang Model:</b> <code>{escape_html(model_id)}</code>",
+                )
             return
 
         if data.startswith("set_mode:"):
@@ -179,6 +188,12 @@ class BotRouter:
 
     async def _cmd_help(self, chat_id: int) -> None:
         session = self.state.get_session(chat_id)
+        effective_model = self.state.get_effective_model(chat_id)
+        model_display = (
+            f"{effective_model} (Đồng bộ theo máy)"
+            if session.model in ("auto", "local")
+            else session.model
+        )
         help_html = (
             "⚡ <b>Anti-Tele-An — Cầu nối Antigravity CLI (Python)</b>\n\n"
             "💬 <b>Cách dùng cơ bản:</b>\n"
@@ -193,13 +208,19 @@ class BotRouter:
             "• /stop — Dừng ngay lập tức tiến trình đang chạy\n"
             "• /usage — Xem thống kê Token & cấu hình phiên hiện tại\n"
             "• /status — Kiểm tra trạng thái máy tính & kết nối\n\n"
-            f"📌 <b>Hiện tại:</b> Model <code>{escape_html(session.model)}</code> | "
+            f"📌 <b>Hiện tại:</b> Model <code>{escape_html(model_display)}</code> | "
             f"Workspace: <code>{escape_html(session.workspace)}</code>"
         )
         await self.tg.send_message(chat_id, help_html)
 
     async def _cmd_status(self, chat_id: int) -> None:
         session = self.state.get_session(chat_id)
+        effective_model = self.state.get_effective_model(chat_id)
+        model_display = (
+            f"{effective_model} (Đồng bộ theo máy tính)"
+            if session.model in ("auto", "local")
+            else session.model
+        )
         busy_str = "⚡ Đang xử lý tác vụ" if self.bridge.is_busy(chat_id) else "🟢 Đang rảnh (Sẵn sàng)"
         conv_str = session.conversation_id or "Chưa có (Sẽ tạo mới ở tin nhắn tới)"
         status_html = (
@@ -207,7 +228,7 @@ class BotRouter:
             f"• <b>Trạng thái Bot:</b> {busy_str}\n"
             f"• <b>Hệ điều hành:</b> <code>{escape_html(platform.system())} {escape_html(platform.release())}</code>\n"
             f"• <b>Python:</b> <code>{escape_html(platform.python_version())}</code>\n"
-            f"• <b>Model đang dùng:</b> <code>{escape_html(session.model)}</code>\n"
+            f"• <b>Model đang dùng:</b> <code>{escape_html(model_display)}</code>\n"
             f"• <b>Chế độ thực thi:</b> <code>{escape_html(session.permission_mode)}</code>\n"
             f"• <b>Workspace:</b> <code>{escape_html(session.workspace)}</code>\n"
             f"• <b>Conversation ID:</b> <code>{escape_html(conv_str)}</code>"
@@ -216,10 +237,16 @@ class BotRouter:
 
     async def _cmd_usage(self, chat_id: int) -> None:
         session = self.state.get_session(chat_id)
+        effective_model = self.state.get_effective_model(chat_id)
+        model_display = (
+            f"{effective_model} (Đồng bộ theo máy)"
+            if session.model in ("auto", "local")
+            else session.model
+        )
         u = session.usage
         usage_html = (
             "📊 <b>Thống kê Sử dụng Phiên (Token Usage):</b>\n\n"
-            f"• <b>Model hiện tại:</b> <code>{escape_html(session.model)}</code>\n"
+            f"• <b>Model hiện tại:</b> <code>{escape_html(model_display)}</code>\n"
             f"• <b>Số lượt phản hồi (Turns):</b> <code>{u.turns:,}</code>\n"
             f"• <b>Input Tokens:</b> <code>{u.input_tokens:,}</code>\n"
             f"• <b>Output Tokens:</b> <code>{u.output_tokens:,}</code>\n"
@@ -233,10 +260,17 @@ class BotRouter:
         session = self.state.get_session(chat_id)
         if direct_arg:
             self.state.set_model(chat_id, direct_arg)
-            await self.tg.send_message(
-                chat_id,
-                f"🤖 <b>Đã đặt Model:</b> <code>{escape_html(direct_arg)}</code>",
-            )
+            effective = self.state.get_effective_model(chat_id)
+            if direct_arg in ("auto", "local"):
+                await self.tg.send_message(
+                    chat_id,
+                    f"🤖 <b>Đã đặt Model:</b> <code>Tự động đồng bộ theo máy tính ({escape_html(effective)})</code>",
+                )
+            else:
+                await self.tg.send_message(
+                    chat_id,
+                    f"🤖 <b>Đã đặt Model:</b> <code>{escape_html(direct_arg)}</code>",
+                )
             return
 
         wait_msg = await self.tg.send_message(chat_id, "⏳ <i>Đang lấy danh sách model từ Antigravity CLI...</i>")
@@ -252,16 +286,34 @@ class BotRouter:
                 await self.tg.send_message(chat_id, err_html)
             return
 
+        is_auto = session.model in ("auto", "local")
+        effective_model = self.state.get_effective_model(chat_id)
+
         keyboard: list[list[dict[str, str]]] = []
+        # Tùy chọn tự động đồng bộ theo máy tính ở đầu danh sách
+        keyboard.append(
+            [
+                {
+                    "text": f"{'✅ ' if is_auto else ''}🔄 Tự động theo máy ({effective_model})",
+                    "callback_data": "set_model:auto",
+                }
+            ]
+        )
+
         for model_id, display_name in models:
-            prefix = "✅ " if model_id == session.model else ""
+            prefix = "✅ " if (model_id == session.model and not is_auto) else ""
             keyboard.append(
                 [{"text": f"{prefix}{display_name}", "callback_data": f"set_model:{model_id}"}]
             )
 
+        model_display = (
+            f"{effective_model} (Đồng bộ theo máy)"
+            if is_auto
+            else session.model
+        )
         text_html = (
             f"🤖 <b>Chọn AI Model cho phiên làm việc:</b>\n"
-            f"Hiện tại: <code>{escape_html(session.model)}</code>\n\n"
+            f"Hiện tại: <code>{escape_html(model_display)}</code>\n\n"
             f"👉 <i>Bấm trực tiếp vào nút bên dưới để chuyển đổi:</i>"
         )
         markup = {"inline_keyboard": keyboard}

@@ -7,7 +7,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-from src.config import DATA_DIR, AppConfig
+from src.config import DATA_DIR, AppConfig, get_active_local_model
 
 
 @dataclass
@@ -24,7 +24,7 @@ class UsageStats:
 class ChatSession:
     chat_id: int
     conversation_id: str | None = None
-    model: str = "gemini-4-argon-high"
+    model: str = "auto"
     workspace: str = ""
     permission_mode: str = "auto"
     usage: UsageStats = field(default_factory=UsageStats)
@@ -62,7 +62,7 @@ class StateManager:
                 self._sessions[chat_id] = ChatSession(
                     chat_id=chat_id,
                     conversation_id=val.get("conversation_id"),
-                    model=val.get("model") or self.app_config.default_model,
+                    model=val.get("model") or "auto",
                     workspace=val.get("workspace") or self.app_config.default_workspace,
                     permission_mode=val.get("permission_mode") or self.app_config.permission_mode,
                     usage=usage,
@@ -89,6 +89,17 @@ class StateManager:
             )
             self._save()
         return self._sessions[chat_id]
+
+    def get_effective_model(self, chat_id: int) -> str:
+        """
+        Trả về model có hiệu lực:
+        - Nếu session.model là 'auto' hoặc 'local' -> lấy model hiện tại mà máy tính đang dùng.
+        - Nếu người dùng đã chọn một model cụ thể -> trả về model đó.
+        """
+        session = self.get_session(chat_id)
+        if not session.model or session.model.lower() in ("auto", "local", "current"):
+            return get_active_local_model()
+        return session.model
 
     def set_conversation(self, chat_id: int, conversation_id: str | None) -> None:
         session = self.get_session(chat_id)
