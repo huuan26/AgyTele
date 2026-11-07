@@ -37,6 +37,21 @@ class TestFormatter(unittest.TestCase):
         for chunk in chunks:
             self.assertTrue(chunk.startswith("<pre>"))
             self.assertTrue(chunk.endswith("</pre>"))
+    def test_markdown_formatting_extensions(self) -> None:
+        md = "Đây là ~~gạch ngang~~ và ||bí mật|| cùng ++gạch chân++."
+        html_out = markdown_to_telegram_html(md)
+        self.assertIn("<s>gạch ngang</s>", html_out)
+        self.assertIn("<tg-spoiler>bí mật</tg-spoiler>", html_out)
+        self.assertIn("<u>gạch chân</u>", html_out)
+
+    def test_split_html_message_balances_tg_spoiler(self) -> None:
+        long_spoiler = "<tg-spoiler>" + ("secret " * 600) + "</tg-spoiler>"
+        chunks = split_html_message(long_spoiler, limit=1000)
+        self.assertGreater(len(chunks), 1)
+        for chunk in chunks:
+            self.assertTrue(chunk.startswith("<tg-spoiler>"))
+            self.assertTrue(chunk.endswith("</tg-spoiler>"))
+
 
 
 class TestToolFormatting(unittest.TestCase):

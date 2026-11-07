@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import html
 import json
 import re
 import urllib.error
@@ -72,7 +73,7 @@ class TelegramClient:
         res = await self.call_api("sendMessage", payload)
         if not res.get("ok"):
             # Fallback: Nếu thẻ HTML không hợp lệ, tự động lọc thẻ và gửi dạng văn bản thuần
-            plain_text = re.sub(r"<[^>]+>", "", text)
+            plain_text = html.unescape(re.sub(r"<[^>]+>", "", text))
             fallback_payload: dict[str, Any] = {
                 "chat_id": chat_id,
                 "text": plain_text,
@@ -121,7 +122,7 @@ class TelegramClient:
 
         res = await self.call_api("editMessageText", payload)
         if not res.get("ok") and "message is not modified" not in str(res.get("description", "")).lower():
-            plain_text = re.sub(r"<[^>]+>", "", text)
+            plain_text = html.unescape(re.sub(r"<[^>]+>", "", text))
             payload.pop("parse_mode", None)
             payload["text"] = plain_text
             res = await self.call_api("editMessageText", payload)
