@@ -13,13 +13,6 @@
   <strong>Pure Python Async Telegram Bridge for Google Antigravity CLI</strong>
 </p>
 
-<p align="center">
-  <a href="https://www.python.org/"><img src="https://img.shields.io/badge/Python-3.10%2B-blue?style=flat-square" alt="Python 3.10+" /></a>
-  <a href="#purpose"><img src="https://img.shields.io/badge/Dependencies-Zero%20(Stdlib)-success?style=flat-square" alt="Zero Dependencies" /></a>
-  <a href="#architecture"><img src="https://img.shields.io/badge/Protocol-Stream--JSON%20(NDJSON)-orange?style=flat-square" alt="Stream-JSON" /></a>
-  <a href="#purpose"><img src="https://img.shields.io/badge/Security-Port%209877%20Lock-blueviolet?style=flat-square" alt="Socket Lock" /></a>
-</p>
-
 </div>
 
 ---
