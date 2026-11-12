@@ -82,7 +82,17 @@ def markdown_to_telegram_html(md_text: str) -> str:
     text = re.sub(r"(?<!\*)\*([^\*\n]+)\*(?!\*)", r"<i>\1</i>", text)
     text = re.sub(r"\b_([^_\n]+)_\b", r"<i>\1</i>", text)
 
-    # 10. Khôi phục các khối code từ placeholder
+    # 10. Gạch ngang (~~strikethrough~~ hoặc ~strikethrough~)
+    text = re.sub(r"~~([^~\n]+)~~", r"<s>\1</s>", text)
+    text = re.sub(r"(?<!~)~([^~\n]+)~(?!~)", r"<s>\1</s>", text)
+
+    # 11. Spoiler (||spoiler||)
+    text = re.sub(r"\|\|([^|\n]+)\|\|", r"<tg-spoiler>\1</tg-spoiler>", text)
+
+    # 12. Gạch chân (++underline++)
+    text = re.sub(r"\+\+([^\+\n]+)\+\+", r"<u>\1</u>", text)
+
+    # 13. Khôi phục các khối code từ placeholder
     for idx, fragment in enumerate(placeholders):
         text = text.replace(f"\x00CODEBLOCK{idx}END\x00", fragment)
 
@@ -92,12 +102,12 @@ def markdown_to_telegram_html(md_text: str) -> str:
 def split_html_message(html_text: str, limit: int = MAX_TELEGRAM_LENGTH) -> list[str]:
     """
     Chia nhỏ tin nhắn HTML dài (> 4000 ký tự) theo dòng và tự động đóng/mở lại
-    các thẻ HTML (<pre>, <code>, <b>, <i>, <blockquote>) để không bị lỗi parse_mode=HTML.
+    các thẻ HTML (<pre>, <code>, <b>, <i>, <blockquote>, <tg-spoiler>) để không bị lỗi parse_mode=HTML.
     """
     if len(html_text) <= limit:
         return [html_text]
 
-    tag_pattern = re.compile(r"</?([a-zA-Z0-9]+)(?:\s+[^>]*)?>")
+    tag_pattern = re.compile(r"</?([a-zA-Z0-9_-]+)(?:\s+[^>]*)?>")
 
     def _get_open_tags(chunk_str: str) -> list[tuple[str, str]]:
         stack: list[tuple[str, str]] = []
